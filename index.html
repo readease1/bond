@@ -500,16 +500,16 @@
                 const card = document.createElement('div');
                 card.className = 'character-card';
                 card.innerHTML = `
-                    <img src="${character.image}" alt="${character.name}" class="character-image">
-                    <div class="character-name">${character.name}</div>
-                    <div class="vote-count" id="votes-${character.id}">0 votes</div>
-                    <button class="vote-btn" onclick="vote('${character.id}')" id="btn-${character.id}">
-                        Vote for ${character.name}
-                    </button>
-                    <a href="https://google.com" target="_blank" class="info-btn">
-                        More Info
-                    </a>
-                `;
+    <img src="${character.image}" alt="${character.name}" class="character-image">
+    <div class="character-name">${character.name}</div>
+    <div class="vote-count" id="votes-${character.id}">0 votes</div>
+    <button class="vote-btn" onclick="vote('${character.id}')" id="btn-${character.id}">
+        Vote for ${character.name}
+    </button>
+    <a href="${character.infoLink}" target="_blank" class="info-btn">
+        More Info
+    </a>
+`;
                 grid.appendChild(card);
             });
             
