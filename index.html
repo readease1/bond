@@ -362,7 +362,8 @@
         let backgroundAudio = null;
         
         // Bags.fm API configuration
-        const BAGS_API_KEY = 'bags_prod_8Hk5XQc3AE0BiErVp53IssnkrNWM-VJwa-58YnSK4b4'; // Replace with your real API key
+        // Option 1: Set your API key directly here (less secure but works for client-side)
+        const BAGS_API_KEY = 'bags_prod_8Hk5XQc3AE0BiErVp53IssnkrNWM-VJwa-58YnSK4b4'; // Your real API key
         
         // Option 2: Or get it from a URL parameter for security: ?apikey=your-key
         const urlParams = new URLSearchParams(window.location.search);
@@ -370,6 +371,9 @@
         
         const FINAL_API_KEY = API_KEY_FROM_URL || BAGS_API_KEY;
         const BAGS_API_URL = 'https://public-api-v2.bags.fm/api/v1/token-launch/lifetime-fees';
+        
+        // Add your token mint public key here
+        const TOKEN_MINT = '3ADU6MRzHbk5WT6afFUGvw4pum9BbQsFxUrn1UbBBAGS'; // Your actual token mint
 
         // Initialize the app
         async function initializeApp() {
@@ -611,10 +615,17 @@
         // Fetch and update fees from bags.fm API
         async function updateFees() {
             try {
-                // Check if we have a valid API key
+                // Check if we have a valid API key and token mint
                 if (!FINAL_API_KEY || FINAL_API_KEY === 'your-actual-api-key-here') {
                     throw new Error('API key not configured');
                 }
+                
+                if (!TOKEN_MINT || TOKEN_MINT === 'your-token-mint-public-key-here') {
+                    throw new Error('Token mint not configured');
+                }
+                
+                // Build URL with query parameter
+                const apiUrl = `${BAGS_API_URL}?tokenMint=${TOKEN_MINT}`;
                 
                 const options = {
                     method: 'GET',
@@ -623,9 +634,10 @@
                     }
                 };
                 
-                console.log('Fetching fees with API key:', FINAL_API_KEY.substring(0, 10) + '...');
+                console.log('Fetching fees from:', apiUrl);
+                console.log('Using API key:', FINAL_API_KEY.substring(0, 10) + '...');
                 
-                const response = await fetch(BAGS_API_URL, options);
+                const response = await fetch(apiUrl, options);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -637,20 +649,17 @@
                 // Update the display with the fees data
                 const feesAmount = document.getElementById('feesAmount');
                 
-                if (data && data.totalFees !== undefined) {
-                    // Format the fees (assuming it's in some currency unit)
-                    const formattedFees = new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }).format(data.totalFees);
+                if (data && data.success && data.response) {
+                    // Convert from lamports to SOL (1 SOL = 1,000,000,000 lamports)
+                    const lamports = parseInt(data.response);
+                    const sol = lamports / 1000000000;
                     
-                    feesAmount.textContent = formattedFees;
+                    // Format as SOL
+                    feesAmount.textContent = `${sol.toFixed(4)} SOL`;
                     feesAmount.classList.remove('fees-loading');
                 } else {
                     // Fallback if data structure is different
-                    feesAmount.textContent = JSON.stringify(data);
+                    feesAmount.textContent = 'No data';
                     feesAmount.classList.remove('fees-loading');
                 }
                 
@@ -660,8 +669,12 @@
                 
                 if (error.message.includes('401')) {
                     feesAmount.textContent = 'Invalid API Key';
+                } else if (error.message.includes('400')) {
+                    feesAmount.textContent = 'Bad Request';
                 } else if (error.message.includes('API key not configured')) {
                     feesAmount.textContent = 'API Key Missing';
+                } else if (error.message.includes('Token mint not configured')) {
+                    feesAmount.textContent = 'Token Mint Missing';
                 } else {
                     feesAmount.textContent = 'API Error';
                 }
@@ -670,13 +683,8 @@
                 
                 // Show demo data for testing after 3 seconds
                 setTimeout(() => {
-                    const demoFees = Math.random() * 10000 + 5000; // Random demo fees
-                    feesAmount.textContent = new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }).format(demoFees) + ' (Demo)';
+                    const demoSol = (Math.random() * 50 + 10).toFixed(4); // Random demo SOL
+                    feesAmount.textContent = `${demoSol} SOL (Demo)`;
                     feesAmount.classList.remove('fees-loading');
                 }, 3000);
             }
