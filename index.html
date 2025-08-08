@@ -32,12 +32,6 @@
             margin-bottom: 40px;
         }
 
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
         .timer {
             font-size: 2rem;
             font-weight: bold;
@@ -124,6 +118,38 @@
             box-shadow: 0 10px 20px rgba(68, 160, 141, 0.3);
         }
 
+        .vote-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-message {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 50px 0;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
         .social-buttons {
             position: fixed;
             top: 20px;
@@ -198,38 +224,6 @@
         .fees-loading {
             opacity: 0.6;
             font-style: italic;
-        }
-
-        .vote-btn:disabled {
-            background: #666;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .status-message {
-            text-align: center;
-            font-size: 1.2rem;
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .loading {
-            text-align: center;
-            font-size: 1.5rem;
-            margin: 50px 0;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .loading {
-            animation: pulse 1.5s infinite;
         }
 
         @media (max-width: 768px) {
@@ -338,7 +332,7 @@
             measurementId: "G-7PQVGK1BMJ"
         };
 
-        // Initialize Firebase with demo config (you'll need to replace with your actual config)
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
@@ -368,7 +362,7 @@
         let backgroundAudio = null;
         
         // Bags.fm API configuration
-        const BAGS_API_KEY = process.env.BAGS_API_KEY || 'your-api-key-here'; // You'll set this in Vercel
+        const BAGS_API_KEY = 'your-api-key-here'; // You'll set this in Vercel environment variables
         const BAGS_API_URL = 'https://public-api-v2.bags.fm/api/v1/token-launch/lifetime-fees';
 
         // Initialize the app
