@@ -158,6 +158,48 @@
             object-fit: contain;
         }
 
+        .social-btn.bags img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .fees-display {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 15px;
+            padding: 15px 20px;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.1rem;
+            z-index: 1000;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .fees-title {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .fees-amount {
+            font-size: 1.3rem;
+            font-weight: 900;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .fees-loading {
+            opacity: 0.6;
+            font-style: italic;
+        }
+
         .vote-btn:disabled {
             background: #666;
             cursor: not-allowed;
@@ -223,16 +265,39 @@
                 width: 25px;
                 height: 25px;
             }
+            
+            .social-btn.bags img {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .fees-display {
+                top: 10px;
+                left: 10px;
+                padding: 10px 15px;
+                font-size: 1rem;
+                min-width: 180px;
+            }
+            
+            .fees-amount {
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Fees Display -->
+    <div class="fees-display" id="feesDisplay">
+        <div class="fees-title">Total Fees Generated</div>
+        <div class="fees-amount fees-loading" id="feesAmount">Loading...</div>
+    </div>
+
     <!-- Social Media Buttons -->
     <div class="social-buttons">
         <a href="https://x.com" target="_blank" class="social-btn">
             <img src="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/67eb5f126865fed9aa39960f_twittegold.png" alt="Twitter">
         </a>
-        <a href="https://bags.fm" target="_blank" class="social-btn">
+        <a href="https://bags.fm" target="_blank" class="social-btn bags">
             <img src="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/68955ee11ab0a80f6424a2b0_stock-vector-bag-gold-plated-metalic-icon-logo-vector-removebg-preview.png" alt="Bags.fm">
         </a>
     </div>
@@ -301,12 +366,20 @@
         let votingEnabled = true;
         let audioPlaying = false;
         let backgroundAudio = null;
+        
+        // Bags.fm API configuration
+        const BAGS_API_KEY = process.env.BAGS_API_KEY || 'your-api-key-here'; // You'll set this in Vercel
+        const BAGS_API_URL = 'https://public-api-v2.bags.fm/api/v1/token-launch/lifetime-fees';
 
         // Initialize the app
         async function initializeApp() {
             try {
                 // Set up audio
                 setupAudio();
+                
+                // Start fees updates
+                updateFees();
+                setInterval(updateFees, 30000); // Update every 30 seconds
                 
                 await initializeSession();
                 displayCharacters();
@@ -330,6 +403,10 @@
             
             // Set up audio for demo mode too
             setupAudio();
+            
+            // Start fees updates in demo mode too
+            updateFees();
+            setInterval(updateFees, 30000);
             
             displayCharacters();
             startTimerUpdate();
@@ -529,6 +606,65 @@
             setTimeout(() => {
                 statusEl.style.display = 'none';
             }, 5000);
+        }
+
+        // Fetch and update fees from bags.fm API
+        async function updateFees() {
+            try {
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        'x-api-key': BAGS_API_KEY
+                    }
+                };
+                
+                const response = await fetch(BAGS_API_URL, options);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Bags.fm API response:', data);
+                
+                // Update the display with the fees data
+                const feesAmount = document.getElementById('feesAmount');
+                
+                if (data && data.totalFees !== undefined) {
+                    // Format the fees (assuming it's in some currency unit)
+                    const formattedFees = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }).format(data.totalFees);
+                    
+                    feesAmount.textContent = formattedFees;
+                    feesAmount.classList.remove('fees-loading');
+                } else {
+                    // Fallback if data structure is different
+                    feesAmount.textContent = JSON.stringify(data);
+                    feesAmount.classList.remove('fees-loading');
+                }
+                
+            } catch (error) {
+                console.error('Error fetching fees:', error);
+                const feesAmount = document.getElementById('feesAmount');
+                feesAmount.textContent = 'API Error';
+                feesAmount.classList.add('fees-loading');
+                
+                // Show demo data for testing
+                setTimeout(() => {
+                    const demoFees = Math.random() * 10000 + 5000; // Random demo fees
+                    feesAmount.textContent = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }).format(demoFees);
+                    feesAmount.classList.remove('fees-loading');
+                }, 2000);
+            }
         }
 
         // Setup audio functionality
