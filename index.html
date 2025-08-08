@@ -252,63 +252,6 @@
             font-style: italic;
         }
 
-        .winners-platform {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(255, 215, 0, 0.2);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 215, 0, 0.5);
-            border-radius: 15px;
-            padding: 20px;
-            color: #ffd700;
-            font-weight: bold;
-            z-index: 1000;
-            min-width: 250px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .winners-title {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-align: center;
-            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-            padding-bottom: 10px;
-        }
-
-        .winner-entry {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .winner-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid rgba(255, 215, 0, 0.5);
-        }
-
-        .winner-info {
-            flex: 1;
-        }
-
-        .winner-round {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
-
-        .winner-name {
-            font-size: 1rem;
-            font-weight: 900;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -359,18 +302,6 @@
             .fees-amount {
                 font-size: 1.1rem;
             }
-
-            .winners-platform {
-                bottom: 10px;
-                left: 10px;
-                padding: 15px;
-                min-width: 200px;
-            }
-
-            .winner-image {
-                width: 50px;
-                height: 50px;
-            }
         }
     </style>
 </head>
@@ -379,18 +310,6 @@
     <div class="fees-display" id="feesDisplay">
         <div class="fees-title">Total Fees Generated</div>
         <div class="fees-amount fees-loading" id="feesAmount">Loading...</div>
-    </div>
-
-    <!-- Winners Platform -->
-    <div class="winners-platform">
-        <div class="winners-title">🏆 Hall of Fame</div>
-        <div class="winner-entry">
-            <img src="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/6895569ddf17a7b144a6eb62_2025-07-31_FRICK-BREANNA.jpg" alt="Breanna Frick" class="winner-image">
-            <div class="winner-info">
-                <div class="winner-round">Round 1 Winner</div>
-                <div class="winner-name">Breanna Frick</div>
-            </div>
-        </div>
     </div>
 
     <!-- Social Media Buttons -->
@@ -443,27 +362,27 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Updated characters data
+        // Disney characters data
         const characters = [
-            {
-                id: 'kianna',
-                name: 'Kianna Triviso',
-                image: 'https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/68956d44c7135f7224c4f9ee_1926555%20(1).jpg',
-                infoLink: 'https://newmexico.arrests.org/Arrests/Kianna_Triviso_65107645/'
-            },
-            {
-                id: 'angelica',
-                name: 'Angelica Loomis-Lucero',
-                image: 'https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/68956d444a3c119256ff3da9_22436458659233.jpg',
-                infoLink: 'https://newmexico.arrests.org/Arrests/Angelica_Loomis-Lucero_65110680/'
-            },
-            {
-                id: 'alexa',
-                name: 'Alexa Gonzalez-Cruz',
-                image: 'https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/68956d4497fb3c87f3aaecab_22456670532386.jpg',
-                infoLink: 'https://newmexico.arrests.org/Arrests/Alexa_Gonzalez-Cruz_65119464/'
-            }
-        ];
+    {
+        id: 'mickey',
+        name: 'Breanna Frick',
+        image: 'https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/6895569ddf17a7b144a6eb62_2025-07-31_FRICK-BREANNA.jpg',
+        infoLink: 'https://nebraska.arrests.org/Arrests/Breanna_Frick_65071989/'
+    },
+    {
+        id: 'elsa',
+        name: 'Mackinzie Sanders',
+        image: 'https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/6895569d4d6347861bf9b961_382626.jpg',
+        infoLink: 'https://texas.arrests.org/Arrests/Mackinzie_Sanders_65120436/'
+    },
+    {
+        id: 'simba',
+        name: 'Lila Free',
+        image: 'https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/6895569d7c9d5dbb0c42aada_22456713707682.jpg',
+        infoLink: 'https://newmexico.arrests.org/Arrests/Lila_Free_65128057/'
+    }
+];
 
         let currentSession = null;
         let hasVoted = false;
@@ -472,19 +391,29 @@
         let backgroundAudio = null;
         
         // Bags.fm API configuration
-        const BAGS_API_KEY = 'bags_prod_8Hk5XQc3AE0BiErVp53IssnkrNWM-VJwa-58YnSK4b4';
+        // Option 1: Set your API key directly here (less secure but works for client-side)
+        const BAGS_API_KEY = 'bags_prod_8Hk5XQc3AE0BiErVp53IssnkrNWM-VJwa-58YnSK4b4'; // Your real API key
+        
+        // Option 2: Or get it from a URL parameter for security: ?apikey=your-key
         const urlParams = new URLSearchParams(window.location.search);
         const API_KEY_FROM_URL = urlParams.get('apikey');
+        
         const FINAL_API_KEY = API_KEY_FROM_URL || BAGS_API_KEY;
         const BAGS_API_URL = 'https://public-api-v2.bags.fm/api/v1/token-launch/lifetime-fees';
-        const TOKEN_MINT = 'ANxJCvpJtQ9hHhukNberX6M2mB1wUzWaPR77z4AeBAGS';
+        
+        // Add your token mint public key here
+        const TOKEN_MINT = 'ANxJCvpJtQ9hHhukNberX6M2mB1wUzWaPR77z4AeBAGS'; // Your actual token mint
 
         // Initialize the app
         async function initializeApp() {
             try {
+                // Set up audio
                 setupAudio();
+                
+                // Start fees updates
                 updateFees();
-                setInterval(updateFees, 30000);
+                setInterval(updateFees, 30000); // Update every 30 seconds
+                
                 await initializeSession();
                 displayCharacters();
                 startTimerUpdate();
@@ -501,13 +430,17 @@
         function initializeDemoMode() {
             console.log('Running in demo mode');
             currentSession = {
-                endTime: Date.now() + (30 * 60 * 1000),
-                votes: { kianna: 0, angelica: 0, alexa: 0 }
+                endTime: Date.now() + (30 * 60 * 1000), // 30 minutes from now
+                votes: { mickey: 0, elsa: 0, simba: 0 }
             };
             
+            // Set up audio for demo mode too
             setupAudio();
+            
+            // Start fees updates in demo mode too
             updateFees();
             setInterval(updateFees, 30000);
+            
             displayCharacters();
             startTimerUpdate();
             document.getElementById('loading').style.display = 'none';
@@ -526,10 +459,11 @@
                         const now = Date.now();
                         
                         if (!session || now > session.endTime) {
+                            // Create new session
                             const newSession = {
                                 startTime: now,
-                                endTime: now + (30 * 60 * 1000),
-                                votes: { kianna: 0, angelica: 0, alexa: 0 }
+                                endTime: now + (30 * 60 * 1000), // 30 minutes
+                                votes: { mickey: 0, elsa: 0, simba: 0 }
                             };
                             
                             sessionRef.set(newSession)
@@ -545,6 +479,7 @@
                     })
                     .catch(reject);
                 
+                // Listen for session updates
                 sessionRef.on('value', (snapshot) => {
                     const session = snapshot.val();
                     if (session) {
@@ -565,16 +500,16 @@
                 const card = document.createElement('div');
                 card.className = 'character-card';
                 card.innerHTML = `
-                    <img src="${character.image}" alt="${character.name}" class="character-image">
-                    <div class="character-name">${character.name}</div>
-                    <div class="vote-count" id="votes-${character.id}">0 votes</div>
-                    <button class="vote-btn" onclick="vote('${character.id}')" id="btn-${character.id}">
-                        Vote for ${character.name}
-                    </button>
-                    <a href="${character.infoLink}" target="_blank" class="info-btn">
-                        More Info
-                    </a>
-                `;
+    <img src="${character.image}" alt="${character.name}" class="character-image">
+    <div class="character-name">${character.name}</div>
+    <div class="vote-count" id="votes-${character.id}">0 votes</div>
+    <button class="vote-btn" onclick="vote('${character.id}')" id="btn-${character.id}">
+        Vote for ${character.name}
+    </button>
+    <a href="${character.infoLink}" target="_blank" class="info-btn">
+        More Info
+    </a>
+`;
                 grid.appendChild(card);
             });
             
@@ -595,6 +530,7 @@
                         return (currentVotes || 0) + 1;
                     });
                 } else {
+                    // Demo mode
                     currentSession.votes[characterId] = (currentSession.votes[characterId] || 0) + 1;
                     updateVoteCounts();
                 }
@@ -699,6 +635,7 @@
             statusEl.textContent = message;
             statusEl.style.display = 'block';
             
+            // Auto hide after 5 seconds
             setTimeout(() => {
                 statusEl.style.display = 'none';
             }, 5000);
@@ -707,6 +644,7 @@
         // Fetch and update fees from bags.fm API
         async function updateFees() {
             try {
+                // Check if we have a valid API key and token mint
                 if (!FINAL_API_KEY || FINAL_API_KEY === 'your-actual-api-key-here') {
                     throw new Error('API key not configured');
                 }
@@ -715,6 +653,7 @@
                     throw new Error('Token mint not configured');
                 }
                 
+                // Build URL with query parameter
                 const apiUrl = `${BAGS_API_URL}?tokenMint=${TOKEN_MINT}`;
                 
                 const options = {
@@ -724,6 +663,9 @@
                     }
                 };
                 
+                console.log('Fetching fees from:', apiUrl);
+                console.log('Using API key:', FINAL_API_KEY.substring(0, 10) + '...');
+                
                 const response = await fetch(apiUrl, options);
                 
                 if (!response.ok) {
@@ -731,14 +673,21 @@
                 }
                 
                 const data = await response.json();
+                console.log('Bags.fm API response:', data);
+                
+                // Update the display with the fees data
                 const feesAmount = document.getElementById('feesAmount');
                 
                 if (data && data.success && data.response) {
+                    // Convert from lamports to SOL (1 SOL = 1,000,000,000 lamports)
                     const lamports = parseInt(data.response);
                     const sol = lamports / 1000000000;
+                    
+                    // Format as SOL
                     feesAmount.textContent = `${sol.toFixed(4)} SOL`;
                     feesAmount.classList.remove('fees-loading');
                 } else {
+                    // Fallback if data structure is different
                     feesAmount.textContent = 'No data';
                     feesAmount.classList.remove('fees-loading');
                 }
@@ -761,8 +710,9 @@
                 
                 feesAmount.classList.add('fees-loading');
                 
+                // Show demo data for testing after 3 seconds
                 setTimeout(() => {
-                    const demoSol = (Math.random() * 50 + 10).toFixed(4);
+                    const demoSol = (Math.random() * 50 + 10).toFixed(4); // Random demo SOL
                     feesAmount.textContent = `${demoSol} SOL (Demo)`;
                     feesAmount.classList.remove('fees-loading');
                 }, 3000);
@@ -771,10 +721,12 @@
 
         // Setup audio functionality
         function setupAudio() {
+            // Create audio element
             backgroundAudio = new Audio('https://raw.githubusercontent.com/readease1/bond/main/song.mp3');
             backgroundAudio.loop = true;
-            backgroundAudio.volume = 0.3;
+            backgroundAudio.volume = 0.3; // Set to 30% volume
             
+            // Add click listener to document for autoplay
             function startAudio() {
                 if (!audioPlaying) {
                     backgroundAudio.play().then(() => {
@@ -784,11 +736,13 @@
                         console.log('Audio autoplay failed:', error);
                     });
                     
+                    // Remove the listener after first click
                     document.removeEventListener('click', startAudio);
                     document.removeEventListener('touchstart', startAudio);
                 }
             }
             
+            // Listen for both click and touch events
             document.addEventListener('click', startAudio);
             document.addEventListener('touchstart', startAudio);
         }
