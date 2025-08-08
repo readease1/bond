@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disney Character Vote</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .character-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .character-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .character-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .character-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .vote-count {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .vote-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .vote-btn:hover {
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(238, 90, 36, 0.3);
+        }
+
+        .vote-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-message {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 50px 0;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .timer {
+                font-size: 1.5rem;
+            }
+            
+            .character-card {
+                padding: 20px;
+            }
+            
+            .character-image {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Disney Character Vote ✨</h1>
+            <div class="timer" id="timer">Loading...</div>
+        </div>
+
+        <div id="loading" class="loading">
+            🏰 Loading magical voting session...
+        </div>
+
+        <div id="voting-area" style="display: none;">
+            <div class="characters-grid" id="charactersGrid">
+                <!-- Characters will be populated here -->
+            </div>
+        </div>
+
+        <div id="statusMessage" class="status-message" style="display: none;"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "demo-api-key",
+            authDomain: "demo-project.firebaseapp.com",
+            databaseURL: "https://demo-project-default-rtdb.firebaseio.com",
+            projectId: "demo-project",
+            storageBucket: "demo-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        // Initialize Firebase with demo config (you'll need to replace with your actual config)
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Disney characters data
+        const characters = [
+            {
+                id: 'mickey',
+                name: 'Mickey Mouse',
+                image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=face'
+            },
+            {
+                id: 'elsa',
+                name: 'Elsa',
+                image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=face'
+            },
+            {
+                id: 'simba',
+                name: 'Simba',
+                image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=face'
+            }
+        ];
+
+        let currentSession = null;
+        let hasVoted = false;
+        let votingEnabled = true;
+
+        // Initialize the app
+        async function initializeApp() {
+            try {
+                await initializeSession();
+                displayCharacters();
+                startTimerUpdate();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('voting-area').style.display = 'block';
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                showStatus('Error connecting to voting system. Using demo mode.', 'error');
+                initializeDemoMode();
+            }
+        }
+
+        // Initialize demo mode when Firebase is not available
+        function initializeDemoMode() {
+            console.log('Running in demo mode');
+            currentSession = {
+                endTime: Date.now() + (30 * 60 * 1000), // 30 minutes from now
+                votes: { mickey: 0, elsa: 0, simba: 0 }
+            };
+            
+            displayCharacters();
+            startTimerUpdate();
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('voting-area').style.display = 'block';
+            showStatus('Demo mode - votes are local only', 'info');
+        }
+
+        // Initialize or get current session
+        async function initializeSession() {
+            return new Promise((resolve, reject) => {
+                const sessionRef = database.ref('currentSession');
+                
+                sessionRef.once('value')
+                    .then((snapshot) => {
+                        const session = snapshot.val();
+                        const now = Date.now();
+                        
+                        if (!session || now > session.endTime) {
+                            // Create new session
+                            const newSession = {
+                                startTime: now,
+                                endTime: now + (30 * 60 * 1000), // 30 minutes
+                                votes: { mickey: 0, elsa: 0, simba: 0 }
+                            };
+                            
+                            sessionRef.set(newSession)
+                                .then(() => {
+                                    currentSession = newSession;
+                                    resolve();
+                                })
+                                .catch(reject);
+                        } else {
+                            currentSession = session;
+                            resolve();
+                        }
+                    })
+                    .catch(reject);
+                
+                // Listen for session updates
+                sessionRef.on('value', (snapshot) => {
+                    const session = snapshot.val();
+                    if (session) {
+                        currentSession = session;
+                        updateVoteCounts();
+                        checkVotingStatus();
+                    }
+                });
+            });
+        }
+
+        // Display characters
+        function displayCharacters() {
+            const grid = document.getElementById('charactersGrid');
+            grid.innerHTML = '';
+            
+            characters.forEach(character => {
+                const card = document.createElement('div');
+                card.className = 'character-card';
+                card.innerHTML = `
+                    <img src="${character.image}" alt="${character.name}" class="character-image">
+                    <div class="character-name">${character.name}</div>
+                    <div class="vote-count" id="votes-${character.id}">0 votes</div>
+                    <button class="vote-btn" onclick="vote('${character.id}')" id="btn-${character.id}">
+                        Vote for ${character.name}
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+            
+            updateVoteCounts();
+        }
+
+        // Vote for a character
+        async function vote(characterId) {
+            if (hasVoted || !votingEnabled) {
+                showStatus('You can only vote once per session!', 'warning');
+                return;
+            }
+
+            try {
+                if (currentSession) {
+                    const voteRef = database.ref(`currentSession/votes/${characterId}`);
+                    await voteRef.transaction((currentVotes) => {
+                        return (currentVotes || 0) + 1;
+                    });
+                } else {
+                    // Demo mode
+                    currentSession.votes[characterId] = (currentSession.votes[characterId] || 0) + 1;
+                    updateVoteCounts();
+                }
+                
+                hasVoted = true;
+                disableVoting();
+                showStatus(`You voted for ${characters.find(c => c.id === characterId).name}! ✨`, 'success');
+                
+            } catch (error) {
+                console.error('Error voting:', error);
+                showStatus('Error recording vote. Please try again.', 'error');
+            }
+        }
+
+        // Update vote counts display
+        function updateVoteCounts() {
+            if (!currentSession) return;
+            
+            characters.forEach(character => {
+                const count = currentSession.votes[character.id] || 0;
+                const element = document.getElementById(`votes-${character.id}`);
+                if (element) {
+                    element.textContent = `${count} vote${count !== 1 ? 's' : ''}`;
+                }
+            });
+        }
+
+        // Check if voting should be enabled
+        function checkVotingStatus() {
+            if (!currentSession) return;
+            
+            const now = Date.now();
+            const timeRemaining = currentSession.endTime - now;
+            
+            if (timeRemaining <= 0) {
+                votingEnabled = false;
+                disableVoting();
+                showWinner();
+            }
+        }
+
+        // Disable all voting buttons
+        function disableVoting() {
+            characters.forEach(character => {
+                const button = document.getElementById(`btn-${character.id}`);
+                if (button) {
+                    button.disabled = true;
+                    button.textContent = hasVoted ? '✓ Voted' : 'Voting Ended';
+                }
+            });
+        }
+
+        // Show winner
+        function showWinner() {
+            if (!currentSession) return;
+            
+            let winner = characters[0];
+            let maxVotes = currentSession.votes[winner.id] || 0;
+            
+            characters.forEach(character => {
+                const votes = currentSession.votes[character.id] || 0;
+                if (votes > maxVotes) {
+                    maxVotes = votes;
+                    winner = character;
+                }
+            });
+            
+            showStatus(`🏆 Winner: ${winner.name} with ${maxVotes} votes! 🎉`, 'success');
+        }
+
+        // Update timer display
+        function startTimerUpdate() {
+            function updateTimer() {
+                if (!currentSession) {
+                    document.getElementById('timer').textContent = 'Loading...';
+                    return;
+                }
+                
+                const now = Date.now();
+                const timeRemaining = currentSession.endTime - now;
+                
+                if (timeRemaining <= 0) {
+                    document.getElementById('timer').textContent = '⏰ Voting Ended!';
+                    checkVotingStatus();
+                    return;
+                }
+                
+                const minutes = Math.floor(timeRemaining / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                
+                document.getElementById('timer').textContent = 
+                    `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')} remaining`;
+            }
+            
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize app when page loads
+        window.addEventListener('load', initializeApp);
+    </script>
+</body>
+</html>
