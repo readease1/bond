@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAILINGBADDIESLIVE</title>
-    <link rel="icon" type="image/png" href="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/68c2568328642f6e2a518dca_New%20Project%20(11).png">
+    <link rel="icon" type="image/png" href="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/6895652bd16eca538fb276a5_stock-vector-bag-gold-plated-metalic-icon-logo-vector-removebg-preview%20(1).png">
     <style>
         * {
             margin: 0;
@@ -712,13 +712,15 @@
                 
                 // Show demo data for testing after 3 seconds
                 setTimeout(() => {
-        feesAmount.textContent = "Loading...";
-        feesAmount.classList.remove('fees-loading');
-    }, 3000);
-}
+                    const demoSol = (Math.random() * 50 + 10).toFixed(4); // Random demo SOL
+                    feesAmount.textContent = `${demoSol} SOL (Demo)`;
+                    feesAmount.classList.remove('fees-loading');
+                }, 3000);
+            }
+        }
 
-// Setup audio functionality
-function setupAudio() {
+        // Setup audio functionality
+        function setupAudio() {
             // Create audio element
             backgroundAudio = new Audio('https://raw.githubusercontent.com/readease1/bond/main/song.mp3');
             backgroundAudio.loop = true;
