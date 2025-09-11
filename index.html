@@ -712,12 +712,13 @@
                 
                 // Show demo data for testing after 3 seconds
                 setTimeout(() => {
-    feesAmount.textContent = "Loading...";
-    feesAmount.classList.remove('fees-loading');
-}, 3000);
+        feesAmount.textContent = "Loading...";
+        feesAmount.classList.remove('fees-loading');
+    }, 3000);
+}
 
-        // Setup audio functionality
-        function setupAudio() {
+// Setup audio functionality
+function setupAudio() {
             // Create audio element
             backgroundAudio = new Audio('https://raw.githubusercontent.com/readease1/bond/main/song.mp3');
             backgroundAudio.loop = true;
