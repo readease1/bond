@@ -712,12 +712,9 @@
                 
                 // Show demo data for testing after 3 seconds
                 setTimeout(() => {
-                    const demoSol = (Math.random() * 50 + 10).toFixed(4); // Random demo SOL
-                    feesAmount.textContent = `${demoSol} SOL (Demo)`;
-                    feesAmount.classList.remove('fees-loading');
-                }, 3000);
-            }
-        }
+    feesAmount.textContent = "Loading...";
+    feesAmount.classList.remove('fees-loading');
+}, 3000);
 
         // Setup audio functionality
         function setupAudio() {
